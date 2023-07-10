@@ -1,0 +1,67 @@
+on:
+  workflow_call:
+    inputs:
+      nextVersion:
+        description: 'Next development version without "SNAPSHOT". If not provided, the next version will be calculated from the pom'
+        required: false
+        type: string
+      buildDir:
+        description: 'Maven build directory. Default is current dir.'
+        required: false
+        type: string
+      depProperty:
+        description: 'New release version to be used on this property'
+        required: false
+        type: string
+      depDirectory:
+        description: 'Directory for pom.xml containing the dependency'
+        required: false
+        type: string
+
+jobs:
+  post-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 5
+
+      - name: Configure GIT
+        run: |
+          git config --global user.name 'Gluon Bot'
+          git config --global user.email 'gluon-bot@users.noreply.github.com'
+
+      - name: Setup Java and Apache Maven
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Commit next development version
+        if: steps.deploy.outputs.exit_code == 0
+        run: |
+          NEW_PROJECT_VERSION=$NEXT_VERSION
+          if [ -z "$NEW_PROJECT_VERSION" ]; then
+            TAG=${GITHUB_REF/refs\/tags\//}
+            NEW_PROJECT_VERSION=${TAG%.*}.$((${TAG##*.} + 1))
+          fi
+          echo "Update development version to $NEW_PROJECT_VERSION"
+          if [ -z "$BUILD_DIR" ]; then
+            BUILD_DIR=.
+          fi
+          mvn versions:set -DnewVersion=$NEW_PROJECT_VERSION-SNAPSHOT -DgenerateBackupPoms=false -f $BUILD_DIR
+          git add $BUILD_DIR/pom.xml
+          if [ -z "$DEP_PROPERTY" ] && [ -z "$DEP_DIR" ]; then
+            mvn versions:set-property -Dproperty=$DEP_PROPERTY -DnewVersion=$NEW_PROJECT_VERSION-SNAPSHOT -f $DEP_DIR
+            git add $DEP_DIR/pom.xml
+          fi
+          git commit -m "Prepare development of $NEW_PROJECT_VERSION"
+          git push https://gluon-bot:$PAT@github.com/$GITHUB_REPOSITORY HEAD:main
+        shell: bash
+        env:
+          PAT: ${{ secrets.GITHUB_TOKEN }}
+          NEXT_VERSION: ${{ inputs.nextVersion }}
+          BUILD_DIR: ${{ inputs.buildDir }}
+          DEP_PROPERTY: ${{ inputs.depProperty }}
+          DEP_DIR: ${{ inputs.depDirectory }}
