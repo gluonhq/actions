@@ -50,10 +50,10 @@ jobs:
           if [ -z "$BUILD_DIR" ]; then
             BUILD_DIR=.
           fi
-          mvn versions:set -DnewVersion=$NEW_PROJECT_VERSION-SNAPSHOT -DgenerateBackupPoms=false -f $BUILD_DIR
+          mvn -q versions:set -DnewVersion=$NEW_PROJECT_VERSION-SNAPSHOT -DgenerateBackupPoms=false -f $BUILD_DIR
           git add $BUILD_DIR/pom.xml
-          if [ -z "$DEP_PROPERTY" ] && [ -z "$DEP_DIR" ]; then
-            mvn versions:set-property -Dproperty=$DEP_PROPERTY -DnewVersion=$NEW_PROJECT_VERSION-SNAPSHOT -f $DEP_DIR
+          if [ ! -z "$DEP_PROPERTY" ] && [ ! -z "$DEP_DIR" ]; then
+            mvn -q versions:set-property -Dproperty=$DEP_PROPERTY -DnewVersion=$NEW_PROJECT_VERSION-SNAPSHOT -f $DEP_DIR
             git add $DEP_DIR/pom.xml
           fi
           git commit -m "Prepare development of $NEW_PROJECT_VERSION"
