@@ -13,10 +13,17 @@ on:
         description: 'Directory for pom.xml containing the dependency'
         required: false
         type: string
+    outputs:
+      tag:
+        description: "Release tag"
+        value: ${{ jobs.pre-release.outputs.tag }}
 
 jobs:
   pre-release:
     runs-on: ubuntu-latest
+    # Map the job outputs to step outputs
+    outputs:
+      tag: ${{ steps.release.outputs.tag }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -35,6 +42,7 @@ jobs:
           java-version: '17'
 
       - name: Update to release version
+        id: release
         run: |
           if [ -z "$BUILD_DIR" ]; then
             BUILD_DIR=.
@@ -48,6 +56,9 @@ jobs:
           fi
           git commit -m "Release v$PROJECT_VERSION"
           git push https://gluon-bot:$PAT@github.com/$GITHUB_REPOSITORY HEAD:main
+          git tag $PROJECT_VERSION
+          git push https://gluon-bot:$PAT@github.com/$GITHUB_REPOSITORY $PROJECT_VERSION
+          echo "tag=$PROJECT_VERSION" >> $GITHUB_OUTPUT
         shell: bash
         env:
           PAT: ${{ secrets.GITHUB_TOKEN }}

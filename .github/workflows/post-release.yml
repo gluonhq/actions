@@ -17,6 +17,10 @@ on:
         description: 'Directory for pom.xml containing the dependency'
         required: false
         type: string
+      tag:
+        description: 'release tag'
+        required: true
+        type: string
 
 jobs:
   post-release:
