@@ -41,15 +41,15 @@ jobs:
       - name: Commit next development version
         if: steps.deploy.outputs.exit_code == 0
         run: |
+          if [ -z "$BUILD_DIR" ]; then
+            BUILD_DIR=.
+          fi
           NEW_PROJECT_VERSION=$NEXT_VERSION
           if [ -z "$NEW_PROJECT_VERSION" ]; then
             PROJECT_VERSION=$(mvn -q help:evaluate -Dexpression=project.version -q -DforceStdout -f $BUILD_DIR)
             NEW_PROJECT_VERSION=${PROJECT_VERSION%.*}.$((${PROJECT_VERSION##*.} + 1))
           fi
           echo "Update development version to $NEW_PROJECT_VERSION"
-          if [ -z "$BUILD_DIR" ]; then
-            BUILD_DIR=.
-          fi
           mvn -q versions:set -DnewVersion=$NEW_PROJECT_VERSION-SNAPSHOT -DgenerateBackupPoms=false -f $BUILD_DIR
           git add $BUILD_DIR/pom.xml
           if [ ! -z "$DEP_PROPERTY" ] && [ ! -z "$DEP_DIR" ]; then
