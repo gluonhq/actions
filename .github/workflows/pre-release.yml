@@ -39,11 +39,11 @@ jobs:
           if [ -z "$BUILD_DIR" ]; then
             BUILD_DIR=.
           fi
-          mvn -B versions:set -DremoveSnapshot -DgenerateBackupPoms=false -f $BUILD_DIR
+          mvn -q versions:set -DremoveSnapshot -DgenerateBackupPoms=false -f $BUILD_DIR
           git add $BUILD_DIR/pom.xml
-          PROJECT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout -f $BUILD_DIR)
-          if [ -z "$DEP_PROPERTY" ] && [ -z "$DEP_DIR" ]; then
-            mvn versions:set-property -Dproperty=$DEP_PROPERTY -DnewVersion=$PROJECT_VERSION -f $DEP_DIR
+          PROJECT_VERSION=$(mvn -q help:evaluate -Dexpression=project.version -q -DforceStdout -f $BUILD_DIR)
+          if [ ! -z "$DEP_PROPERTY" ] && [ ! -z "$DEP_DIR" ]; then
+            mvn -q versions:set-property -Dproperty=$DEP_PROPERTY -DnewVersion=$PROJECT_VERSION -f $DEP_DIR
             git add $DEP_DIR/pom.xml
           fi
           git commit -m "Release v$PROJECT_VERSION"
