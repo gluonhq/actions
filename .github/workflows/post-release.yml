@@ -43,6 +43,12 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Create GitHub release
+        if: steps.deploy.outputs.exit_code == 0
+        uses: softprops/action-gh-release@v1
+        with:
+          generate_release_notes: true
+
       - name: Commit next development version
         if: steps.deploy.outputs.exit_code == 0
         run: |
