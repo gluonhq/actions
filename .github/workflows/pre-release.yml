@@ -1,17 +1,18 @@
 on:
   workflow_call:
-    buildDir:
-      description: 'Maven build directory. Default is current dir.'
-      required: false
-      type: string
-    depProperty:
-      description: 'New release version to be used on this property'
-      required: false
-      type: string
-    depDirectory:
-      description: 'Directory for pom.xml containing the dependency'
-      required: false
-      type: string
+    inputs:
+      buildDir:
+        description: 'Maven build directory. Default is current dir.'
+        required: false
+        type: string
+      depProperty:
+        description: 'New release version to be used on this property'
+        required: false
+        type: string
+      depDirectory:
+        description: 'Directory for pom.xml containing the dependency'
+        required: false
+        type: string
 
 jobs:
   pre-release:
