@@ -40,6 +40,7 @@ jobs:
         with:
           distribution: 'oracle'
           java-version: '17'
+          cache: 'maven'
 
       - name: Update to release version
         id: release

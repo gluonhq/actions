@@ -42,6 +42,7 @@ jobs:
         with:
           distribution: 'oracle'
           java-version: '17'
+          cache: 'maven'
 
       - name: Create GitHub release
         if: steps.deploy.outputs.exit_code == 0
