@@ -40,7 +40,6 @@ jobs:
         with:
           distribution: 'oracle'
           java-version: '17'
-          cache: 'maven'
 
       - name: Update to release version
         id: release
@@ -49,12 +48,11 @@ jobs:
             BUILD_DIR=.
           fi
           mvn -q versions:set -DremoveSnapshot -DgenerateBackupPoms=false -f $BUILD_DIR
-          git add $BUILD_DIR/pom.xml
           PROJECT_VERSION=$(mvn -q help:evaluate -Dexpression=project.version -q -DforceStdout -f $BUILD_DIR)
           if [ ! -z "$DEP_PROPERTY" ] && [ ! -z "$DEP_DIR" ]; then
-            mvn -q versions:set-property -Dproperty=$DEP_PROPERTY -DnewVersion=$PROJECT_VERSION -f $DEP_DIR
-            git add $DEP_DIR/pom.xml
+            mvn -q versions:set-property -Dproperty=$DEP_PROPERTY -DnewVersion=$PROJECT_VERSION -DgenerateBackupPoms=false -f $DEP_DIR
           fi
+          git add .
           git commit -m "Release v$PROJECT_VERSION"
           git push https://gluon-bot:$PAT@github.com/$GITHUB_REPOSITORY HEAD:main
           git tag $PROJECT_VERSION

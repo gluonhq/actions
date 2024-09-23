@@ -42,7 +42,6 @@ jobs:
         with:
           distribution: 'oracle'
           java-version: '17'
-          cache: 'maven'
 
       - name: Create GitHub release
         if: steps.deploy.outputs.exit_code == 0
@@ -64,11 +63,10 @@ jobs:
           fi
           echo "Update development version to $NEW_PROJECT_VERSION"
           mvn -q versions:set -DnewVersion=$NEW_PROJECT_VERSION-SNAPSHOT -DgenerateBackupPoms=false -f $BUILD_DIR
-          git add $BUILD_DIR/pom.xml
           if [ ! -z "$DEP_PROPERTY" ] && [ ! -z "$DEP_DIR" ]; then
-            mvn -q versions:set-property -Dproperty=$DEP_PROPERTY -DnewVersion=$NEW_PROJECT_VERSION-SNAPSHOT -f $DEP_DIR
-            git add $DEP_DIR/pom.xml
+            mvn -q versions:set-property -Dproperty=$DEP_PROPERTY -DnewVersion=$NEW_PROJECT_VERSION-SNAPSHOT -DgenerateBackupPoms=false -f $DEP_DIR
           fi
+          git add .
           git commit -m "Prepare development of $NEW_PROJECT_VERSION"
           git push https://gluon-bot:$PAT@github.com/$GITHUB_REPOSITORY HEAD:main
         shell: bash
