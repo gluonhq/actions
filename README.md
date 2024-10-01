@@ -48,3 +48,4 @@ It commits back the `pom.xml` to the repository with a commit `Prepare developme
 | depProperty  |                         | Property name to be updated with new release version. Mostly used in samples projects.                     |
 | depDirectory |                         | project directory containing the pom.xml to be updated with new release version i.e. samples project path. |
 | tag          |                         | release tag to checkout                                                                                    |
+| release     | true                    | Create Github Release                                                                                      |
