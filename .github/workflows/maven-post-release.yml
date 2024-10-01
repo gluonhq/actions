@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 5
           ref: ${{ inputs.tag }}
@@ -43,14 +43,14 @@ jobs:
           git config --global user.email 'gluon-bot@users.noreply.github.com'
 
       - name: Setup Java and Apache Maven
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: 'oracle'
           java-version: '17'
 
       - name: Create GitHub release
         if: ${{ inputs.release }}
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
           tag_name: ${{ inputs.tag }}
